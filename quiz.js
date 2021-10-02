@@ -3,10 +3,12 @@ const { MessageEmbed } = require('discord.js');
 
 module.exports = {
     isSetting: let = false, isGaming: let = false, startChannel: let = null, 
-    host: let = null, hint: let = null, answer: let = null, isHintOpened = false,
+    host: let = null, hint: let = null, answer: let = null, isHintOpened: let = false,
+    try: let = 20, questionEmbed: let = null,
 
     quiz: async function (message){
         const args = message.content.slice(config.PREFIX.length).trim().split(/ +/g);
+        const args_nosplit = message.content.slice(config.PREFIX.length).trim();
         const command = args.shift();
         
         if(command === '스무고개하자'){
@@ -26,7 +28,6 @@ module.exports = {
             this.isSetting = true;
             this.startChannel = message.channel;
             this.host = message.author;
-            console.log(this.isSetting+this.startChannel+this.host);
         }
 
         if(command === '힌트'){
@@ -36,11 +37,11 @@ module.exports = {
             }
             if(this.isGaming){
                 if(message.author == this.host){
-                    if(isHintOpened){
+                    if(this.isHintOpened){
                         message.reply('이미 힌트를 공개했습니다.');
                     }else{
                         openHint(message, this.hint, this.startChannel);
-                        isHintOpened = true;
+                        this.isHintOpened = true;
                     }
                 }else{
                     message.reply('게임의 주최자가 아닙니다.');
@@ -51,11 +52,38 @@ module.exports = {
         }
 
         if(command === '정답'){
-            
+            if(!this.isGaming){ notGaming(message); return; }
+            const guess = args_nosplit.slice(command.length + 1);
+
+            if(guess === this.answer){
+                const embed = new MessageEmbed()
+                    .setColor(config.COLOR_NOTICE)
+                    .setTitle('정답입니다!')
+                    .setAuthor('우승자: ' + message.author.username, message.author.avatarURL())
+                    .setThumbnail(message.author.avatarURL())
+                    .setDescription('**```css\n[ 정답: ' + this.answer + ' ]```**')
+
+                if(message.author === this.host){
+                    embed.setDescription('근데 왜 니가 맞추세요?');
+                }
+
+                await this.startChannel.send({embeds: [embed]});
+                this.isGaming = false;
+            }else{
+                message.reply('땡');
+            }
         }
 
         if(command === '질문'){
-            
+            if(!this.isGaming){ notGaming(message); return; }
+            const question = args_nosplit.slice(command.length + 1);
+            /*          
+            const questionEmbed = new MessageEmbed()
+                .setColor(config.COLOR_DEFAULT)
+                .setTitle('질문리스트')*/
+            addQuestion();
+            questionEmbed.addFields('질문 1', question, false)
+
         }
     },
 
@@ -64,24 +92,24 @@ module.exports = {
 
         if(this.host === message.author && this.isSetting == true){
             if(!this.answer){
-                console.log(args);
                 this.answer = args;
 
                 const hint_embed = new MessageEmbed()
-                    .setColor('#0099ff')
+                    .setColor(config.COLOR_NOTICE)
                     .setTitle('힌트를 정해주세요!')
                     .addField('<예시>', '$동물원 가면 볼 수 있는 것', true)
                 await message.author.send({embeds: [hint_embed]});
             }else{
                 this.hint = args;
-                console.log(this.hint);
                 await message.reply('확인되었습니다.\n이제 스무고개를 시작합니다!');
+
+                questionEmbed = 
 
                 this.isSetting = false;
                 this.isGaming = true;
 
                 const embed = new MessageEmbed()
-                    .setColor('#0099ff')
+                    .setColor(config.COLOR_DEFAULT)
                     .setTitle('스무고개가 시작되었습니다!')
                     .setAuthor('주최자: ' + message.author.username, message.author.avatarURL())
                     .setThumbnail(message.author.avatarURL())
@@ -96,7 +124,7 @@ module.exports = {
                         { name: '```<예시>```', value: '`$정답 고양이`\n`$질문 살아있나요?`\n`$대답 네`', inline: true },
 	                )
                     .setTimestamp()
-                this.startChannel.send({embeds: [embed]});
+                await this.startChannel.send({embeds: [embed]});
             }
         }
     }
@@ -104,7 +132,7 @@ module.exports = {
 
 async function openHint (message, hint, startChannel){
     const embed = new MessageEmbed()
-        .setColor('#0099ff')
+        .setColor(config.COLOR_NOTICE)
         .setTitle('힌트가 공개되었습니다.')
         .setAuthor('주최자: ' + message.author.username, message.author.avatarURL())
         .setThumbnail(message.author.avatarURL())
@@ -112,5 +140,17 @@ async function openHint (message, hint, startChannel){
             { name: '\u200B', value: '\u200B' },
             { name: '```<힌트>```', value: hint, inline: true },
         )
-    startChannel.send({embeds: [embed]});
+    await startChannel.send({embeds: [embed]});
+}
+
+async function notGaming(message){
+    await message.reply('현재 게임 중이 아닙니다.');
+}
+
+function startQuiz(){
+
+}
+
+function addQuestion(me){
+
 }
