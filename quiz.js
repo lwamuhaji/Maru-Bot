@@ -3,7 +3,7 @@ const { MessageEmbed } = require('discord.js');
 
 module.exports = {
     isSetting: let = false, isGaming: let = false, startChannel: let = null, 
-    host: let = null, hint: let = null, answer: let = null,
+    host: let = null, hint: let = null, answer: let = null, isHintOpened = false,
 
     quiz: async function (message){
         const args = message.content.slice(config.PREFIX.length).trim().split(/ +/g);
@@ -36,13 +36,26 @@ module.exports = {
             }
             if(this.isGaming){
                 if(message.author == this.host){
-                    openHint(message, this.hint, this.startChannel);
+                    if(isHintOpened){
+                        message.reply('이미 힌트를 공개했습니다.');
+                    }else{
+                        openHint(message, this.hint, this.startChannel);
+                        isHintOpened = true;
+                    }
                 }else{
                     message.reply('게임의 주최자가 아닙니다.');
                 }
             }else{
                 message.reply('게임이 진행중이 아닙니다.\n`$스무고개하자`로 게임을 시작해보세요.')
             }
+        }
+
+        if(command === '정답'){
+            
+        }
+
+        if(command === '질문'){
+            
         }
     },
 
