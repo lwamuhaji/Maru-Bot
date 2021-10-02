@@ -21,7 +21,8 @@ client.player = player;
 
 client.on("ready", () => { console.log("Bot Ready"); })
 
-client.login(config.BOT_TOKEN);
+//client.login(config.BOT_TOKEN);
+client.login(process.env.TOKEN);
 
 // Emitted when channel was empty.
 client.player.on('channelEmpty',  (queue) => console.log(`Everyone left the Voice Channel, queue ended.`));
