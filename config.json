@@ -1,0 +1,8 @@
+{ 
+	"BOT_TOKEN": "",
+    "PREFIX": "$",
+
+    "COLOR_DEFAULT": "#0099FF",
+    "COLOR_WARN": "#FF0000",
+    "COLOR_NOTICE": "#00FF7F"
+}

@@ -1,0 +1,6 @@
+{ 
+    "DEFAULT": "#0099FF",
+    "WARNING": "#FF0000",
+    "NOTICE": "#00FF7F",
+    "ALARM": "#EE82EE"
+}
